@@ -86,18 +86,18 @@ class Slave(TCPClient):
 async def main_process():
     loop = IOLoop.current()
     slave = Slave(
-        server_address=("localhost", 13105),
+        server_address=("vipa-109", 13105),
     )
-    # await slave.get_system_info()
-    result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
-    result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
-    result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
-    result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=10)
-    result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=100 * 1 << 20)
-    result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
-    result_2 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
+    await slave.get_system_info()
+    # result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
+    # result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
+    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
+    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=10)
+    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=100 * 1 << 20)
+    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
+    # result_2 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
     # if result_1.success:
-        # await slave.release_gpus(result_1.uuids)
+    # await slave.release_gpus(result_1.uuids)
     # result_1 = await slave.release_gpus(["613d7378335611ea88671831bfcc2809"])
     loop.stop()
 

@@ -2,11 +2,12 @@ import os
 import sys
 import atexit
 import multiprocessing
+import argparse
 from tornado.ioloop import IOLoop
 from server import HashPowerDistributer
 
 
-def make_daemon(pid_file=None):
+def make_daemon(host, port, pid_file=None):
     """
     Create daemon process
     Args:
@@ -45,11 +46,20 @@ def make_daemon(pid_file=None):
 
     # run ioloop
     server = HashPowerDistributer(logger_path="/var/log/hashpwd/")
-    server.listen(13105, "localhost")
+    server.listen(port, host)
     IOLoop.current().start()
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pid_filepath", type=str)
+    parser.add_argument("--port", type=int, default=13105)
+    parser.add_argument("--host", type=str, default="localhost")
+    args = parser.parse_args()
+
     multiprocessing.set_start_method('forkserver')
-    # make_daemon("/media/Data/project/hash-power-distributor/hashpwd.pid")
-    make_daemon("/var/run/hashpwd.pid")
+    make_daemon(
+        host=args.host,
+        port=args.port,
+        pid_file=args.pid_filepath
+    )

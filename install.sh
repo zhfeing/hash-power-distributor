@@ -1,5 +1,8 @@
 #!/bin/sh
 
+port=13105
+host=10.214.211.5
+
 # usage
 usage()
 {
@@ -54,7 +57,7 @@ install()
 Description=Job that runs your user script\n\
 \n\
 [Service]\n\
-ExecStart=$python_exec $exec_filepath\n\
+ExecStart=$python_exec $exec_filepath --pid_filepath=$pid_filepath --host=$host --port=$port\n\
 Type=oneshot\n\
 RemainAfterExit=yes\n\
 \n\
