@@ -8,9 +8,11 @@ usage()
     ./install.sh [-p | --python /absolute/path/to/python]"
 }
 
+install_path="/usr/local/hashpwd"
 service_filepath="/etc/systemd/system/hashpwd.service"
-exec_filepath="/media/Data/project/hash-power-distributor/src/main.py"
-pid_filepath="/media/Data/project/hash-power-distributor/hashpwd.pid"
+exec_filepath="$install_path/src/main.py"
+pid_filepath="/var/run/hashpwd.pid"
+logger_path="/var/log/hashpwd/"
 
 
 install()
@@ -52,13 +54,15 @@ install()
 Description=Job that runs your user script\n\
 \n\
 [Service]\n\
-ExecStart=$exec_filepath\n\
+ExecStart=$python_exec $exec_filepath\n\
 Type=oneshot\n\
 RemainAfterExit=yes\n\
 \n\
 [Install]\n\
 WantedBy=multi-user.target" > $service_filepath
-
+    # copy files
+    mkdir $install_path
+    cp -r src $install_path/
     # configure daemon service
     systemctl daemon-reload
     systemctl enable hashpwd.service
@@ -73,7 +77,8 @@ uninstall()
     systemctl daemon-reload
     rm $pid_filepath
     rm $service_filepath
-    # rm $exec_filepath
+    rm -r $install_path
+    rm -r $logger_path
 }
 
 ### Main

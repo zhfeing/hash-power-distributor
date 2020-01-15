@@ -44,12 +44,12 @@ def make_daemon(pid_file=None):
         atexit.register(os.remove, pid_file)
 
     # run ioloop
-    server = HashPowerDistributer(logger_path="/media/Data/project/hash-power-distributor/")
+    server = HashPowerDistributer(logger_path="/var/log/hashpwd/")
     server.listen(13105, "localhost")
     IOLoop.current().start()
 
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('forkserver')
-    make_daemon("/media/Data/project/hash-power-distributor/hashpwd.pid")
-    # daemon("/var/run/hashpwd.pid")
+    # make_daemon("/media/Data/project/hash-power-distributor/hashpwd.pid")
+    make_daemon("/var/run/hashpwd.pid")
