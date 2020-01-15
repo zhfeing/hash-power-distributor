@@ -1,6 +1,10 @@
-__pycache__/
+__pycache__
 *.pyc
 .idea/
 .vscode
 out
 *.pid
+*.log
+.mypy_cache
+build
+dist

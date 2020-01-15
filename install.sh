@@ -9,7 +9,7 @@ usage()
 }
 
 service_filepath="/etc/systemd/system/hashpwd.service"
-exec_filepath="/media/Data/project/hash-power-distributor/src/hash_power_distributer.py"
+exec_filepath="/media/Data/project/hash-power-distributor/src/main.py"
 pid_filepath="/media/Data/project/hash-power-distributor/hashpwd.pid"
 
 
@@ -52,7 +52,7 @@ install()
 Description=Job that runs your user script\n\
 \n\
 [Service]\n\
-ExecStart=$python_exec $exec_filepath\n\
+ExecStart=$exec_filepath\n\
 Type=oneshot\n\
 RemainAfterExit=yes\n\
 \n\
@@ -72,6 +72,7 @@ uninstall()
     systemctl disable hashpwd.service
     systemctl daemon-reload
     rm $pid_filepath
+    rm $service_filepath
     # rm $exec_filepath
 }
 
@@ -87,7 +88,6 @@ fi
 
 while test "$1" != ""
 do
-    echo "0033 $1"
     case $1 in
         install )
             shift
