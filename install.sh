@@ -1,7 +1,7 @@
 #!/bin/sh
 
 port=13105
-host=10.214.211.5
+host=localhost
 
 # usage
 usage()
