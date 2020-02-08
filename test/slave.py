@@ -86,12 +86,13 @@ class Slave(TCPClient):
 async def main_process():
     loop = IOLoop.current()
     slave = Slave(
-        server_address=("vipa-109", 13105),
+        server_address=("zjlab-1", 13105),
     )
     await slave.get_system_info()
-    # result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
-    # result_1 = await slave.release_gpus(["346ae89c338511ea88671831bfcc2809"])
+    result_1 = await slave.release_gpus(["0b2e2e704a4c11eab886f40270a36b56"])
+    # result_1 = await slave.release_gpus(["79e227fb4a4b11eab886f40270a36b56"])
     # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
+    # await asyncio.sleep(1)
     # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=10)
     # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=100 * 1 << 20)
     # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)

@@ -29,6 +29,10 @@ def _enough_memory(handle: nvml.c_nvmlDevice_t, mem_size: int) -> bool:
         return mem_info.free / mem_info.total > GPU_IDLE_THRESHOLD
 
 
+def _device_in_default_model(handle: nvml.c_nvmlDevice_t) -> bool:
+    return nvml.nvmlDeviceGetComputeMode(handle) == nvml.NVML_COMPUTEMODE_DEFAULT
+
+
 class GPUHolderProcessNotStartedError(Exception):
     pass
 
@@ -127,7 +131,7 @@ class HashPowerDistributer(TCPServer):
                 if no_running and no_future_running and enough_mem:
                     idle_gpus.append(i)
             else:
-                if _enough_memory(handle, mem_size):
+                if _enough_memory(handle, mem_size) and _device_in_default_model(handle):
                     idle_gpus.append(i)
 
         return idle_gpus
