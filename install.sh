@@ -29,7 +29,6 @@ install()
     fi
     while test "$1" != ""
     do
-        echo "001 $1\n"
         case $1 in
             -p | --python )
                 shift
