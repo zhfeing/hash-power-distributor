@@ -4,6 +4,7 @@ from tornado.ioloop import IOLoop
 from tornado.netutil import Resolver
 from typing import Tuple, List
 import asyncio
+from functools import partial
 
 import descriptor
 import utils
@@ -17,7 +18,7 @@ class AllocateGpuFailed(Exception):
     pass
 
 
-class Slave(TCPClient):
+class HashPowerClient(TCPClient):
     def __init__(
         self,
         server_address: Tuple,
@@ -45,9 +46,9 @@ class Slave(TCPClient):
         return result
 
     #################################################################################
-    ## requests
+    ## async requests
 
-    async def allocate_gpus(self, num_gpus: int, exclusive: bool = False, mem_size: int = None):
+    async def async_allocate_gpus(self, num_gpus: int, exclusive: bool = False, mem_size: int = None):
         try:
             request = descriptor.Request_AllocateGpus(num_gpus, exclusive, mem_size)
             result: descriptor.Result_AllocateGpus = await self._session(request)
@@ -55,22 +56,21 @@ class Slave(TCPClient):
                 raise ResultTypeError
             if not result.success:
                 print("allocate failed")
-            print(result)
             return result
         except StreamClosedError:
             print("[error] can not connect")
 
-    async def get_system_info(self):
+    async def async_get_system_info(self):
         request = descriptor.Request_GetSystemInfo()
         try:
             result: descriptor.Result_GetSystemInfo = await self._session(request)
             if type(result) != descriptor.Result_GetSystemInfo:
                 raise ResultTypeError
-            print(result)
+            return result
         except StreamClosedError:
             print("[error] can not connect")
 
-    async def release_gpus(self, uuids: List[str]):
+    async def async_release_gpus(self, uuids: List[str]):
         request = descriptor.Request_ReleaseGpus(uuids)
         try:
             result: descriptor.Result_ReleaseGpus = await self._session(request)
@@ -78,33 +78,21 @@ class Slave(TCPClient):
                 raise ResultTypeError
             if not result.success:
                 print("release failed")
-            print(result)
+            return result
         except StreamClosedError:
             print("[error] can not connect")
 
+    #################################################################################
+    ## sync requests
+    def allocate_gpus(self, num_gpus: int, exclusive: bool = False, mem_size: int = None):
+        result = self._loop.run_sync(partial(self.async_allocate_gpus, num_gpus, exclusive, mem_size))
+        return result
 
-async def main_process():
-    loop = IOLoop.current()
-    slave = Slave(
-        server_address=("zjlab-1", 13105),
-    )
-    await slave.get_system_info()
-    result_1 = await slave.release_gpus(["0b2e2e704a4c11eab886f40270a36b56"])
-    # result_1 = await slave.release_gpus(["79e227fb4a4b11eab886f40270a36b56"])
-    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
-    # await asyncio.sleep(1)
-    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=10)
-    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=False, mem_size=100 * 1 << 20)
-    # result_1 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
-    # result_2 = await slave.allocate_gpus(num_gpus=1, exclusive=True, mem_size=10)
-    # if result_1.success:
-    # await slave.release_gpus(result_1.uuids)
-    # result_1 = await slave.release_gpus(["613d7378335611ea88671831bfcc2809"])
-    loop.stop()
+    def get_system_info(self):
+        result = self._loop.run_sync(self.async_get_system_info)
+        return result
 
+    def release_gpus(self, uuids: List[str]):
+        result = self._loop.run_sync(partial(self.async_release_gpus, uuids))
+        return result
 
-
-if __name__ == "__main__":
-    loop = IOLoop.current()
-    loop.add_callback(main_process)
-    loop.start()
